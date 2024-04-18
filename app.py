@@ -3,6 +3,7 @@ import pygame
 import random
 import numpy as np
 from PIL import Image
+import keyboard
 
 # Inizializzazione di Pygame
 pygame.init()
@@ -34,6 +35,7 @@ def main():
         sneaker_list = []
         score = 0
         sneaker_speed = 5
+        girl_x, girl_y = 50, HEIGHT // 2
 
         while True:
             sneaker_speed *= 1.0001  # Aumento esponenziale della velocità
@@ -46,13 +48,16 @@ def main():
             if np.random.rand() < 0.03:
                 sneaker_list.append(spawn_sneaker())
 
-            # Disegno del personaggio e delle sneakers
-            girl_pil_img = Image.fromarray(pygame.surfarray.array3d(girl_img))
-            st.image(girl_pil_img, width=50)
+            # Gestione degli input da tastiera
+            if keyboard.is_pressed("up") and girl_y > 0:
+                girl_y -= 5
+            if keyboard.is_pressed("down") and girl_y < HEIGHT - 50:
+                girl_y += 5
 
+            # Disegno del personaggio e delle sneakers
+            st.image(girl_img, width=50, caption="Girl")
             for sneaker in sneaker_list:
-                sneaker_pil_img = Image.fromarray(pygame.surfarray.array3d(sneaker_img))
-                st.image(sneaker_pil_img, width=50)
+                st.image(sneaker_img, width=50, caption="Sneaker")
 
             # Aggiornamento del punteggio
             st.write(f"Score: {score}")
