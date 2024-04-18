@@ -3,7 +3,6 @@ import pygame
 import random
 import numpy as np
 from PIL import Image
-import keyboard
 
 # Inizializzazione di Pygame
 pygame.init()
@@ -28,7 +27,7 @@ def spawn_sneaker():
 # Funzione principale
 def main():
     st.title("Girl's Catching Game")
-    st.write("Use the arrow keys to move the girl and catch the sneakers!")
+    st.write("Use the dropdown menu in the sidebar to move the girl and catch the sneakers!")
 
     # Avvio del gioco
     if st.button("Start Game"):
@@ -48,12 +47,6 @@ def main():
             if np.random.rand() < 0.03:
                 sneaker_list.append(spawn_sneaker())
 
-            # Gestione degli input da tastiera
-            if keyboard.is_pressed("up") and girl_y > 0:
-                girl_y -= 5
-            if keyboard.is_pressed("down") and girl_y < HEIGHT - 50:
-                girl_y += 5
-
             # Disegno del personaggio e delle sneakers
             st.image(girl_img, width=50, caption="Girl")
             for sneaker in sneaker_list:
@@ -67,6 +60,13 @@ def main():
             # Controllo delle collisioni e fine del gioco
             if any(sneaker[0] <= 0 for sneaker in sneaker_list):
                 break
+
+            # Movimento del personaggio tramite la barra laterale
+            direction = st.sidebar.selectbox("Move the girl", ["Up", "Down"])
+            if direction == "Up" and girl_y > 0:
+                girl_y -= 5
+            elif direction == "Down" and girl_y < HEIGHT - 50:
+                girl_y += 5
 
 if __name__ == "__main__":
     main()
