@@ -2,8 +2,9 @@ import streamlit as st
 import pygame
 import random
 import numpy as np
+from PIL import Image
 
-# Inizializzazione
+# Inizializzazione di Pygame
 pygame.init()
 
 # Dimensioni finestra di gioco
@@ -13,77 +14,54 @@ WIDTH, HEIGHT = 800, 400
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Personaggio
+# Caricamento delle immagini
 girl_img = pygame.image.load("girl.png")
 girl_img = pygame.transform.scale(girl_img, (50, 50))
-girl_vel = 5
-
-# Sneakers (ostacoli)
 sneaker_img = pygame.image.load("sneaker.png")
 sneaker_img = pygame.transform.scale(sneaker_img, (50, 50))
-sneaker_list = []
-sneaker_speed = 5
 
-# Punteggio
-score = 0
-
-# Funzione per muovere le sneakers
-def move_sneakers():
-    global sneaker_speed
-    for sneaker in sneaker_list:
-        sneaker[0] -= sneaker_speed
-
-# Funzione per creare nuove sneakers
+# Funzione per creare una nuova sneaker
 def spawn_sneaker():
-    sneaker_list.append([WIDTH, random.randint(50, HEIGHT - 50)])
-
-# Funzione per controllare le collisioni
-def check_collisions():
-    global score
-
-    girl_rect = pygame.Rect(50, HEIGHT // 2, girl_img.get_width(), girl_img.get_height())
-    for sneaker in sneaker_list:
-        sneaker_rect = pygame.Rect(sneaker[0], sneaker[1], sneaker_img.get_width(), sneaker_img.get_height())
-        if girl_rect.colliderect(sneaker_rect):
-            sneaker_list.remove(sneaker)
-            score += 1
-
-    for sneaker in sneaker_list:
-        if sneaker[0] <= 0:
-            return True
+    return [WIDTH, random.randint(50, HEIGHT - 50)]
 
 # Funzione principale
 def main():
-    global score, sneaker_speed
-
     st.title("Girl's Catching Game")
-
     st.write("Use the arrow keys to move the girl and catch the sneakers!")
 
     # Avvio del gioco
     if st.button("Start Game"):
-        game_over = False
+        sneaker_list = []
         score = 0
         sneaker_speed = 5
-        sneaker_list.clear()
 
-        while not game_over:
-            move_sneakers()
+        while True:
+            sneaker_speed *= 1.0001  # Aumento esponenziale della velocità
 
+            # Movimento delle sneakers
+            for sneaker in sneaker_list:
+                sneaker[0] -= sneaker_speed
+
+            # Generazione di nuove sneakers
             if np.random.rand() < 0.03:
-                spawn_sneaker()
+                sneaker_list.append(spawn_sneaker())
 
-            game_over = check_collisions()
-
-            st.image(girl_img, width=50)
+            # Disegno del personaggio e delle sneakers
+            girl_pil_img = Image.fromarray(pygame.surfarray.array3d(girl_img))
+            st.image(girl_pil_img, width=50)
 
             for sneaker in sneaker_list:
-                st.image(sneaker_img, width=50)
+                sneaker_pil_img = Image.fromarray(pygame.surfarray.array3d(sneaker_img))
+                st.image(sneaker_pil_img, width=50)
 
+            # Aggiornamento del punteggio
             st.write(f"Score: {score}")
 
             st.write("")
 
+            # Controllo delle collisioni e fine del gioco
+            if any(sneaker[0] <= 0 for sneaker in sneaker_list):
+                break
+
 if __name__ == "__main__":
     main()
-
