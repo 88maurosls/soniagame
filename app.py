@@ -24,6 +24,11 @@ sneaker_img = pygame.transform.scale(sneaker_img, (50, 50))
 def spawn_sneaker():
     return [WIDTH, random.randint(50, HEIGHT - 50)]
 
+# Funzione per convertire una superficie Pygame in un array NumPy
+def pygame_surface_to_numpy(surface):
+    image_str = pygame.image.tostring(surface, 'RGB')
+    return np.array(Image.frombytes('RGB', surface.get_size(), image_str))
+
 # Funzione principale
 def main():
     st.title("Girl's Catching Game")
@@ -48,9 +53,9 @@ def main():
                 sneaker_list.append(spawn_sneaker())
 
             # Disegno del personaggio e delle sneakers
-            st.image(girl_img, width=50, caption="Girl")
+            st.image(pygame_surface_to_numpy(girl_img), width=50, caption="Girl")
             for sneaker in sneaker_list:
-                st.image(sneaker_img, width=50, caption="Sneaker")
+                st.image(pygame_surface_to_numpy(sneaker_img), width=50, caption="Sneaker")
 
             # Aggiornamento del punteggio
             st.write(f"Score: {score}")
